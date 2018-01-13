@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,13 +20,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+/*
 @SpringBootTest
 @AutoConfigureMockMvc
-// Or simply:
-// @WebMvcTest
-public class GameRestControllerTest {
+ */
+@WebMvcTest
+public class LoginRestControllerTest {
 
     private static final String MOCK_USERNAME = "test";
+    public static final String LOGIN_URL = "/login";
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,7 +41,7 @@ public class GameRestControllerTest {
     public void givenPostRequest_whenLoginWithNewUsername_ShouldReturnHttpOKAndResponseTypeI() throws Exception {
         given(mockLoginService.login(MOCK_USERNAME)).willReturn(true);
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
                 )
                 .andDo(print())
@@ -51,7 +54,7 @@ public class GameRestControllerTest {
     public void givenPostRequest_whenLoginWithExistingUsernameAndUseExistingFalse_ShouldReturnHttpForbiddenAndResponseTypeW() throws Exception {
         given(mockLoginService.login(MOCK_USERNAME)).willThrow(new UserAlreadyExistsException());
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
                 )
                 .andDo(print())
@@ -63,7 +66,7 @@ public class GameRestControllerTest {
     public void givenPostRequest_whenLoginWithExistingUsernameAndUseExistingTrue_ShouldReturnHttpOKAndResponseTypeI() throws Exception {
         given(mockLoginService.login(MOCK_USERNAME)).willThrow(new UserAlreadyExistsException());
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
                     .param("useExisting", "true")
                 )
@@ -76,7 +79,7 @@ public class GameRestControllerTest {
     public void givenPostRequestWithValidRequest_whenDownstreamError_ShouldReturnHttp503AndResponseTypeE() throws Exception {
         given(mockLoginService.login(anyString())).willThrow(new RuntimeException());
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
                 )
                 .andDo(print())
@@ -87,7 +90,7 @@ public class GameRestControllerTest {
     @Test
     public void givenPostRequestWithoutParams_ShouldReturnHttp400() throws Exception {
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -96,7 +99,7 @@ public class GameRestControllerTest {
     @Test
     public void givenPostRequestWithEmptyUsername_ShouldReturnHttp400() throws Exception {
         this.mockMvc.perform(
-                    post("/login")
+                    post(LOGIN_URL)
                     .param("username", "")
                 )
                 .andDo(print())
