@@ -83,4 +83,23 @@ public class GameRestControllerTest {
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(content().json("{'type': 'E'}",false));
     }
+
+    @Test
+    public void givenPostRequestWithoutParams_ShouldReturnHttp400() throws Exception {
+        this.mockMvc.perform(
+                    post("/login")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void givenPostRequestWithEmptyUsername_ShouldReturnHttp400() throws Exception {
+        this.mockMvc.perform(
+                    post("/login")
+                    .param("username", "")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }
