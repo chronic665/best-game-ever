@@ -5,15 +5,9 @@ public class LoginResponse {
     private final ResponseType type;
     private final String message;
 
-    public enum ResponseType {
-        I,
-        W,
-        E
-    }
-
-    public LoginResponse(final ResponseType type, final String message) {
+    public LoginResponse(final ResponseType type) {
         this.type = type;
-        this.message = message;
+        this.message = type.getMessage();
     }
 
     public ResponseType getType() {
