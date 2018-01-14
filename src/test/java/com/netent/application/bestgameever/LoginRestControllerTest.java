@@ -20,11 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-/*
 @SpringBootTest
 @AutoConfigureMockMvc
- */
-@WebMvcTest
+//@WebMvcTest
 public class LoginRestControllerTest {
 
     private static final String MOCK_USERNAME = "test";
