@@ -1,6 +1,7 @@
 package com.netent.application.bestgameever.control;
 
 import com.netent.application.bestgameever.entity.GameConfig;
+import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.User;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
 import com.netent.application.bestgameever.repo.GameRepository;
@@ -59,5 +60,25 @@ public class GameServiceTest {
         verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), any(), any());
         verify(gameRepository,times(1)).getGameConfig();
         verify(gameRepository,times(1)).storeRound(any(), eq(MOCK_USERNAME));
+    }
+
+    @Test
+    public void givenValidUsernameAndLowFunds_whenPlaying_updateBalanceWithNewFunds() {
+        final String roundId = UUID.randomUUID().toString();
+        // Setting win change to 0% so the RoundResult will alwys be LOSE
+        given(gameRepository.getGameConfig()).willReturn(new GameConfig(10, 0, 0.1, 20, Double.valueOf(1000)));
+        given(personRepository.find(MOCK_USERNAME)).willReturn(new User(MOCK_USERNAME, Double.valueOf(-500)));
+        given(personRepository.updateBalance(eq(MOCK_USERNAME), eq(ResultType.LOSE), eq(Double.valueOf(-10)))).willReturn(Double.valueOf(-510));
+        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME))).willReturn(roundId);
+
+        String result = cut.play(MOCK_USERNAME);
+        assertThat(result, is(roundId));
+
+        verify(personRepository,times(1)).find(eq(MOCK_USERNAME));
+        verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), any(), eq(Double.valueOf(-10)));
+        verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), any(), eq(Double.valueOf(1000)));
+        verify(gameRepository,times(1)).getGameConfig();
+        verify(gameRepository,times(1)).storeRound(eq(ResultType.LOSE), eq(MOCK_USERNAME));
+        verify(gameRepository,times(1)).storeRound(eq(ResultType.FILL_UP_BALANCE), eq(MOCK_USERNAME));
     }
 }
