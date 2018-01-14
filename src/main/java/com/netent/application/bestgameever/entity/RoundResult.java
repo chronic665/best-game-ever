@@ -3,16 +3,18 @@ package com.netent.application.bestgameever.entity;
 import com.google.common.base.MoreObjects;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class RoundResult {
     private final String roundId;
     private final ResultType result;
-    private final LocalDateTime timestamp;
+    private final String timestamp;
 
     public RoundResult(String roundId, ResultType result) {
         this.roundId = roundId;
         this.result = result;
-        timestamp = LocalDateTime.now();
+        timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public String getRoundId() {
@@ -23,7 +25,7 @@ public class RoundResult {
         return result;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 

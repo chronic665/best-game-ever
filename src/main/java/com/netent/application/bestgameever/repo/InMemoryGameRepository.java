@@ -11,10 +11,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,7 +20,7 @@ public class InMemoryGameRepository implements GameRepository {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private TreeBasedTable<String, LocalDateTime, RoundResult> dataStore;
+    private TreeBasedTable<String, String, RoundResult> dataStore;
 
     public InMemoryGameRepository() {
         this.dataStore = TreeBasedTable.create();
@@ -53,12 +51,14 @@ public class InMemoryGameRepository implements GameRepository {
                         List<RoundResult> results = dataStore.row(username).values().stream()
                                 .filter((roundResult) -> roundResult.getRoundId().equals(roundId))
                                 .collect(Collectors.toList());
+                        // if the round doesn't exist, throw exception that will return an HTTP 404 through the spring rest controller
                         if(results.isEmpty()){
                             throw new ResourceNotFoundException("No round with id " + roundId + " for user " + username + " was found");
                         }else {
                             result = results.get(0);
                         }
                         sink.next(result);
+                        // complete sink after first value
                         sink.complete();
                     }
                     return result;
@@ -76,21 +76,23 @@ public class InMemoryGameRepository implements GameRepository {
         boolean dirty = false;
         while(!dirty) {
             // get results for a username
-            SortedMap<LocalDateTime, RoundResult> row = dataStore.row(username);
+            SortedMap<String, RoundResult> row = dataStore.row(username);
             try {
                 // extract last element, catch case that the user didn't play any games yet
                 result = row.get(row.lastKey());
             } catch (NoSuchElementException e) {
                 // ignore, no games yet
             }
+            // break out of the loop if last round and this round have different IDs (i.e. a new round has been played)
             if(result != null && (lastRound == null || !result.getRoundId().equals(lastRound.getRoundId()))) {
                 log.debug("returning round {} for user {}", result, username);
                 dirty = true;
             } else {
+                // grade school waiting
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    System.err.println("meh: " + e);
+                    log.error("meh: {}", e.getMessage(), e);
                 }
             }
         }
