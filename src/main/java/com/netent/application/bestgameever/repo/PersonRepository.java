@@ -7,6 +7,6 @@ import com.netent.application.bestgameever.entity.User;
 public interface PersonRepository {
     User find(String username);
 
-    double updateBalance(String username, ResultType result, GameConfig config);
+    double updateBalance(String username, ResultType result, double amount);
 
 }

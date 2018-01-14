@@ -6,12 +6,12 @@ import java.util.Objects;
 
 public class User {
     private String username;
-    private String balance;
+    private double balance;
 
     public User() {
     }
 
-    public User(String username, String balance) {
+    public User(String username, double balance) {
         this.username = username;
         this.balance = balance;
     }
@@ -24,11 +24,11 @@ public class User {
         this.username = username;
     }
 
-    public String getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

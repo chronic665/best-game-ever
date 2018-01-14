@@ -36,23 +36,31 @@ public class GameService {
         // 2.3 store result
         final String roundId = gameRepository.storeRound(result, username);
         // 2.4 update balance
-        double currentBalance = personRepository.updateBalance(username, result, config);
+        double currentBalance = personRepository.updateBalance(username, result, calculateAmount(result, config));
         if (currentBalance <= config.getCost()) {
             gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username);
-            personRepository.updateBalance(username, ResultType.FILL_UP_BALANCE, config);
+            personRepository.updateBalance(username, ResultType.FILL_UP_BALANCE, config.getFillUpAmount());
         }
         // 3. return roundId
         return roundId;
     }
 
+    private double calculateAmount(ResultType roundResult, GameConfig config) {
+        double amount = 0 - config.getCost();
+        if(roundResult == ResultType.WIN) {
+            amount += config.getPrize();
+        }
+        return amount;
+    }
+
     private ResultType throwDice(final GameConfig config) {
         ResultType type = ResultType.LOSE;
         // roll dice for win
-        if (Math.random() <= 0.3) {
+        if (Math.random() <= config.getWinRate()) {
             type = ResultType.WIN;
         }
         // roll extra dice for free round
-        if (Math.random() <= 0.1) {
+        if (Math.random() <= config.getFreeRoundRate()) {
             // add the free round to the previously rolled result type
             type = (type == ResultType.WIN)
                     ? ResultType.WIN_AND_FREE_ROUND
