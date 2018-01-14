@@ -37,7 +37,7 @@ public class InMemoryGameRepository implements GameRepository {
                 () -> null, // some initial state
                 (state, sink) -> {
                     RoundResult result;
-                    if(roundId != null) {
+                    if(roundId == null) {
                         result = waitForNextResult(username, (RoundResult) state);
                         sink.next(result);
                     } else { // if roundId is requested we only deliver that certain roundId
