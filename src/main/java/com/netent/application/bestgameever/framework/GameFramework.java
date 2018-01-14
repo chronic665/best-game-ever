@@ -3,6 +3,11 @@ package com.netent.application.bestgameever.framework;
 import com.netent.application.bestgameever.entity.ResultType;
 import org.springframework.stereotype.Component;
 
+/**
+ * Game eninge / framework component that takes care of all decisions related to game steps.
+ * Encapsulates the game configuration.
+ * Could be extracted into a standalone service / module.
+ */
 @Component
 public class GameFramework {
     private final GameConfig config;
@@ -12,7 +17,12 @@ public class GameFramework {
         this.config = new GameConfig(10, 0.3, 0.1, 20, 1000);
     }
 
-    public double calculateAmount(ResultType roundResult) {
+    /**
+     * Calculates the win or loss of a round, depending on the result of a dice throw
+     * @param roundResult Dice throw result
+     * @return absolute amount that should be added or subtracted from a players balance
+     */
+    public double calculateAmount(final ResultType roundResult) {
         if(roundResult == ResultType.FILL_UP_BALANCE) {
             throw new IllegalArgumentException("ResultType " + ResultType.FILL_UP_BALANCE + " is not a valid input to calculate round prize");
         }
@@ -23,6 +33,10 @@ public class GameFramework {
         return amount;
     }
 
+    /**
+     * Throws a dice according to the @{@link GameConfig}
+     * @return @{@link ResultType} of the dice throw
+     */
     public ResultType throwDice() {
         ResultType type = ResultType.LOSE;
         // roll dice for win
@@ -39,7 +53,7 @@ public class GameFramework {
         return type;
     }
 
-    public boolean outOfFunds(Double currentBalance) {
+    public boolean outOfFunds(final Double currentBalance) {
         return currentBalance <= config.getCost();
     }
 
