@@ -6,13 +6,16 @@ import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryGameRepository implements GameRepository {
@@ -42,9 +45,22 @@ public class InMemoryGameRepository implements GameRepository {
         return Flux.generate(
                 () -> null, // some initial state
                 (state, sink) -> {
-                    // TODO if roundId is given, return all former games since the roundId
-                    RoundResult result = waitForNextResult(username, (RoundResult) state);
-                    sink.next(result);
+                    RoundResult result;
+                    if(roundId != null) {
+                        result = waitForNextResult(username, (RoundResult) state);
+                        sink.next(result);
+                    } else { // if roundId is requested we only deliver that certain roundId
+                        List<RoundResult> results = dataStore.row(username).values().stream()
+                                .filter((roundresult) -> roundresult.getRoundId().equals(roundId))
+                                .collect(Collectors.toList());
+                        if(results.isEmpty()){
+                            throw new ResourceNotFoundException("No round with id " + roundId + " for user " + username + " was found");
+                        }else {
+                            result = results.get(0);
+                        }
+                        sink.next(result);
+                        sink.complete();
+                    }
                     return result;
                 });
     }

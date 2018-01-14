@@ -1,6 +1,7 @@
 package com.netent.application.bestgameever.boundary;
 
 import com.netent.application.bestgameever.control.GameService;
+import com.netent.application.bestgameever.exception.UserDoesNotExistException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static com.netent.application.bestgameever.testutils.UuidMatcher.matchesUuidPattern;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -53,7 +55,8 @@ public class GameRestControllerPlayTest {
                         .param("username", "")
                 )
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason(containsString("Please make sure you provide a not-empty request parameter 'username'")));
     }
 
     @Test
@@ -61,7 +64,20 @@ public class GameRestControllerPlayTest {
         given(mockGameService.play(MOCK_USERNAME)).willReturn(UUID.randomUUID().toString());
         this.mockMvc.perform(post(PLAY_URL))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Required String parameter 'username' is not present"));
+    }
+
+    @Test
+    public void givenNonExistentUsername_whenPostToPlay_thenReturnsHttp404() throws Exception {
+        given(mockGameService.play(MOCK_USERNAME)).willThrow(new UserDoesNotExistException(MOCK_USERNAME));
+        this.mockMvc.perform(
+                    post(PLAY_URL)
+                        .param("username", MOCK_USERNAME))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("No user with this username exists. Please login first!"));
+
     }
 
 }
