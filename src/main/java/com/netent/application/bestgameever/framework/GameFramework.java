@@ -20,13 +20,14 @@ public class GameFramework {
     /**
      * Calculates the win or loss of a round, depending on the result of a dice throw
      * @param roundResult Dice throw result
+     * @param isFreeRound Indicates if this round is free
      * @return absolute amount that should be added or subtracted from a players balance
      */
-    public double calculateAmount(final ResultType roundResult) {
+    public double calculateAmount(final ResultType roundResult, boolean isFreeRound) {
         if(roundResult == ResultType.FILL_UP_BALANCE) {
             throw new IllegalArgumentException("ResultType " + ResultType.FILL_UP_BALANCE + " is not a valid input to calculate round prize");
         }
-        double amount = 0 - config.getCost();
+        double amount = isFreeRound ? 0 : (0 - config.getCost());
         if(roundResult == ResultType.WIN || roundResult == ResultType.WIN_AND_FREE_ROUND) {
             amount += config.getPrize();
         }

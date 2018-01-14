@@ -1,6 +1,5 @@
 package com.netent.application.bestgameever.control;
 
-import com.netent.application.bestgameever.framework.GameConfig;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.User;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
@@ -66,7 +65,7 @@ public class GameServiceTest {
     public void givenValidUsernameAndLowFunds_whenPlayingAndLosing_updateBalanceWithNewFunds() {
         final String roundId = UUID.randomUUID().toString();
         given(gameFramework.throwDice()).willReturn(ResultType.LOSE);
-        given(gameFramework.calculateAmount(any())).willReturn(Double.valueOf(-10));
+        given(gameFramework.calculateAmount(any(), true)).willReturn(Double.valueOf(-10));
         given(gameFramework.getFillUpAmount()).willReturn(Double.valueOf(1000));
         given(gameFramework.outOfFunds(any())).willReturn(true);
         given(personRepository.find(MOCK_USERNAME)).willReturn(new User(MOCK_USERNAME, Double.valueOf(-500)));

@@ -27,6 +27,7 @@ public class GameService {
     }
 
     public String play(final String username) {
+        // 1. sanity check
         if (personRepository.find(username) == null) {
             throw new UserDoesNotExistException(username);
         }
@@ -36,14 +37,31 @@ public class GameService {
         // 2.3 store result
         final String roundId = gameRepository.storeRound(result, username);
         // 2.4 update balance
-        double currentBalance = personRepository.updateBalance(username, framework.calculateAmount(result));
+        double currentBalance = personRepository.updateBalance(username, framework.calculateAmount(result, false));
         // 2.5 top up user if out-of-funds
         if (framework.outOfFunds(currentBalance)) {
             gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username);
             personRepository.updateBalance(username, framework.getFillUpAmount());
         }
-        // 3. return roundId
+        // 3. if free round was won, trigger new round
+        if(wonAFreeRound(result)) {
+            freeRound(username);
+        }
+        // 4. return roundId
         return roundId;
+    }
+
+    private boolean wonAFreeRound(ResultType result) {
+        return result == ResultType.WIN_AND_FREE_ROUND || result == ResultType.FREE_ROUND;
+    }
+
+    private void freeRound(final String username) {
+        final ResultType result = framework.throwDice();
+        gameRepository.storeRound(result, username);
+        personRepository.updateBalance(username, framework.calculateAmount(result, true));
+        if(wonAFreeRound(result) ) {
+            freeRound(username);
+        }
     }
 
     public Flux<RoundResult> subscribeToResults(final String username, final String roundId) {

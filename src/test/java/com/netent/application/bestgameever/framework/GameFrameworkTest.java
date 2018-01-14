@@ -71,12 +71,12 @@ public class GameFrameworkTest {
 
     @Test
     public void testMoneyCalculation() {
-        assertThat(cut.calculateAmount(null), is(COST));
-        assertThat(cut.calculateAmount(LOSE), is(COST));
-        assertThat(cut.calculateAmount(WIN), is(COST + PRIZE));
-        assertThat(cut.calculateAmount(WIN_AND_FREE_ROUND), is(COST + PRIZE));
-        assertThat(cut.calculateAmount(FREE_ROUND), is(COST));
-        assertThrows(IllegalArgumentException.class, () -> cut.calculateAmount(FILL_UP_BALANCE));
+        assertThat(cut.calculateAmount(null, true), is(COST));
+        assertThat(cut.calculateAmount(LOSE, true), is(COST));
+        assertThat(cut.calculateAmount(WIN, true), is(COST + PRIZE));
+        assertThat(cut.calculateAmount(WIN_AND_FREE_ROUND, true), is(COST + PRIZE));
+        assertThat(cut.calculateAmount(FREE_ROUND, true), is(COST));
+        assertThrows(IllegalArgumentException.class, () -> cut.calculateAmount(FILL_UP_BALANCE, true));
     }
 
     @Test
