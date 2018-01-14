@@ -34,7 +34,11 @@ public class GameService {
             // 2.3 store result
             final String roundId = gameRepository.storeRound(result, username);
             // 2.4 update balance
-            personRepository.updateBalance(username, result, config);
+            double currentBalance = personRepository.updateBalance(username, result, config);
+            if(currentBalance <= config.getCost()) {
+                gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username);
+                personRepository.updateBalance(username, ResultType.FILL_UP_BALANCE, config);
+            }
         // 3. prepare response
         return roundId;
     }

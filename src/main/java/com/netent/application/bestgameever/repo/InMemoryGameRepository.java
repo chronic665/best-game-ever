@@ -30,7 +30,7 @@ public class InMemoryGameRepository implements GameRepository {
 
     @Override
     public GameConfig getGameConfig() {
-        return new GameConfig(10, 0.3, 0.1, 20);
+        return new GameConfig(10, 0.3, 0.1, 20, 1000);
     }
 
     @Override
