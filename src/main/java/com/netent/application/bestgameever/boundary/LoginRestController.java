@@ -26,11 +26,9 @@ public class LoginRestController extends ValidatedRestController {
     public ResponseEntity<LoginResponse> login(@RequestParam @NotEmpty() String username,
                                                @RequestParam(required = false, defaultValue = "false") boolean useExisting) {
         try {
-            loginService.login(username);
+            loginService.login(username, useExisting);
         } catch(UserAlreadyExistsException e) {
-            if(!useExisting) {
-                return httpResponse(ResponseType.W);
-            }
+            return httpResponse(ResponseType.W);
         } catch(RuntimeException e) {
             return httpResponse(ResponseType.E);
         }
