@@ -9,12 +9,15 @@ public class GameFramework {
 
     public GameFramework() {
         // TODO move into application.yml
-        this.config = new GameConfig(10, 0.3, 0.1, 20, 1000);;
+        this.config = new GameConfig(10, 0.3, 0.1, 20, 1000);
     }
 
     public double calculateAmount(ResultType roundResult) {
+        if(roundResult == ResultType.FILL_UP_BALANCE) {
+            throw new IllegalArgumentException("ResultType " + ResultType.FILL_UP_BALANCE + " is not a valid input to calculate round prize");
+        }
         double amount = 0 - config.getCost();
-        if(roundResult == ResultType.WIN) {
+        if(roundResult == ResultType.WIN || roundResult == ResultType.WIN_AND_FREE_ROUND) {
             amount += config.getPrize();
         }
         return amount;

@@ -1,6 +1,5 @@
 package com.netent.application.bestgameever.control;
 
-import com.netent.application.bestgameever.framework.GameConfig;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
