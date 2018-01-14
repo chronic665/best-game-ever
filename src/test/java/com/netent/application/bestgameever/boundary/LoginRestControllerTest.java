@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,7 +36,7 @@ public class LoginRestControllerTest {
 
     @Test
     public void givenPostRequest_whenLoginWithNewUsername_ShouldReturnHttpOKAndResponseTypeI() throws Exception {
-        given(mockLoginService.login(MOCK_USERNAME)).willReturn(true);
+        given(mockLoginService.login(MOCK_USERNAME, false)).willReturn(true);
         this.mockMvc.perform(
                     post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
@@ -48,7 +49,7 @@ public class LoginRestControllerTest {
 
     @Test
     public void givenPostRequest_whenLoginWithExistingUsernameAndUseExistingFalse_ShouldReturnHttpForbiddenAndResponseTypeW() throws Exception {
-        given(mockLoginService.login(MOCK_USERNAME)).willThrow(new UserAlreadyExistsException());
+        given(mockLoginService.login(MOCK_USERNAME, false)).willThrow(new UserAlreadyExistsException());
         this.mockMvc.perform(
                     post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
@@ -60,7 +61,7 @@ public class LoginRestControllerTest {
 
     @Test
     public void givenPostRequest_whenLoginWithExistingUsernameAndUseExistingTrue_ShouldReturnHttpOKAndResponseTypeI() throws Exception {
-        given(mockLoginService.login(MOCK_USERNAME)).willThrow(new UserAlreadyExistsException());
+        given(mockLoginService.login(MOCK_USERNAME, true)).willThrow(new UserAlreadyExistsException());
         this.mockMvc.perform(
                     post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
@@ -73,7 +74,7 @@ public class LoginRestControllerTest {
 
     @Test
     public void givenPostRequestWithValidRequest_whenDownstreamError_ShouldReturnHttp503AndResponseTypeE() throws Exception {
-        given(mockLoginService.login(anyString())).willThrow(new RuntimeException());
+        given(mockLoginService.login(anyString(), anyBoolean())).willThrow(new RuntimeException());
         this.mockMvc.perform(
                     post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)
