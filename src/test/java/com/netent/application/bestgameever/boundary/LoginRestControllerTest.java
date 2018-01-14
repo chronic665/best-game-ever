@@ -1,4 +1,4 @@
-package com.netent.application.bestgameever;
+package com.netent.application.bestgameever.boundary;
 
 import com.netent.application.bestgameever.control.LoginService;
 import com.netent.application.bestgameever.exception.UserAlreadyExistsException;
@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,11 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-/*
 @SpringBootTest
 @AutoConfigureMockMvc
- */
-@WebMvcTest
 public class LoginRestControllerTest {
 
     private static final String MOCK_USERNAME = "test";
