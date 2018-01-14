@@ -51,7 +51,7 @@ public class InMemoryGameRepository implements GameRepository {
                         sink.next(result);
                     } else { // if roundId is requested we only deliver that certain roundId
                         List<RoundResult> results = dataStore.row(username).values().stream()
-                                .filter((roundresult) -> roundresult.getRoundId().equals(roundId))
+                                .filter((roundResult) -> roundResult.getRoundId().equals(roundId))
                                 .collect(Collectors.toList());
                         if(results.isEmpty()){
                             throw new ResourceNotFoundException("No round with id " + roundId + " for user " + username + " was found");
