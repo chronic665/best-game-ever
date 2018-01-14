@@ -4,6 +4,8 @@ import com.google.common.collect.TreeBasedTable;
 import com.netent.application.bestgameever.entity.GameConfig;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
@@ -14,6 +16,8 @@ import java.util.UUID;
 
 @Repository
 public class InMemoryGameRepository implements GameRepository {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private TreeBasedTable<String, LocalDateTime, RoundResult> dataStore;
 
@@ -38,30 +42,37 @@ public class InMemoryGameRepository implements GameRepository {
         return Flux.generate(
                 () -> null, // some initial state
                 (state, sink) -> {
+                    // TODO if roundId is given, return all former games since the roundId
                     RoundResult result = waitForNextResult(username, (RoundResult) state);
                     sink.next(result);
-                    if(result.getRoundId().startsWith("6"))
-                        sink.complete();
                     return result;
                 });
     }
 
-    private RoundResult waitForNextResult(String username, RoundResult lastRound) {
+    /**
+     * Waits and checks the tree table for new elements and returns once there is a new element for a username
+     * @param username
+     * @param lastRound
+     * @return
+     */
+    private RoundResult waitForNextResult(final String username, final RoundResult lastRound) {
         RoundResult result = null;
         boolean dirty = false;
         while(!dirty) {
+            // get results for a username
             SortedMap<LocalDateTime, RoundResult> row = dataStore.row(username);
             try {
+                // extract last element, catch case that the user didn't play any games yet
                 result = row.get(row.lastKey());
             } catch (NoSuchElementException e) {
                 // ignore, no games yet
             }
             if(result != null && (lastRound == null || !result.getRoundId().equals(lastRound.getRoundId()))) {
-                System.out.println("Output: " + result);
+                log.debug("returning round {} for user {}", result, username);
                 dirty = true;
             } else {
                 try {
-                    Thread.sleep(30);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     System.err.println("meh: " + e);
                 }
