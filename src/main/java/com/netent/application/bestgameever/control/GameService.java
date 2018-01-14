@@ -1,72 +1,50 @@
 package com.netent.application.bestgameever.control;
 
-import com.netent.application.bestgameever.entity.GameConfig;
+import com.netent.application.bestgameever.framework.GameConfig;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
+import com.netent.application.bestgameever.framework.GameFramework;
 import com.netent.application.bestgameever.repo.GameRepository;
 import com.netent.application.bestgameever.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import static java.lang.Math.random;
-
 @Service
 public class GameService {
 
     private final GameRepository gameRepository;
     private final PersonRepository personRepository;
+    private final GameFramework framework;
 
     @Autowired
-    public GameService(GameRepository gameRepository, PersonRepository personRepository) {
+    public GameService(GameRepository gameRepository,
+                       PersonRepository personRepository,
+                       GameFramework framework) {
         this.gameRepository = gameRepository;
         this.personRepository = personRepository;
+        this.framework = framework;
     }
 
     public String play(final String username) {
         if (personRepository.find(username) == null) {
             throw new UserDoesNotExistException(username);
         }
-        // 1. get rules
-        final GameConfig config = gameRepository.getGameConfig();
         // 2. play round
         // 2.1 throw dice
-        final ResultType result = throwDice(config);
+        final ResultType result = framework.throwDice();
         // 2.3 store result
         final String roundId = gameRepository.storeRound(result, username);
         // 2.4 update balance
-        double currentBalance = personRepository.updateBalance(username, result, calculateAmount(result, config));
-        if (currentBalance <= config.getCost()) {
+        double currentBalance = personRepository.updateBalance(username, result, framework.calculateAmount(result));
+        // 2.5 top up user if out-of-funds
+        if (framework.outOfFunds(currentBalance)) {
             gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username);
-            personRepository.updateBalance(username, ResultType.FILL_UP_BALANCE, config.getFillUpAmount());
+            personRepository.updateBalance(username, ResultType.FILL_UP_BALANCE, framework.getFillUpAmount());
         }
         // 3. return roundId
         return roundId;
-    }
-
-    private double calculateAmount(ResultType roundResult, GameConfig config) {
-        double amount = 0 - config.getCost();
-        if(roundResult == ResultType.WIN) {
-            amount += config.getPrize();
-        }
-        return amount;
-    }
-
-    private ResultType throwDice(final GameConfig config) {
-        ResultType type = ResultType.LOSE;
-        // roll dice for win
-        if (Math.random() <= config.getWinRate()) {
-            type = ResultType.WIN;
-        }
-        // roll extra dice for free round
-        if (Math.random() <= config.getFreeRoundRate()) {
-            // add the free round to the previously rolled result type
-            type = (type == ResultType.WIN)
-                    ? ResultType.WIN_AND_FREE_ROUND
-                    : ResultType.FREE_ROUND;
-        }
-        return type;
     }
 
     public Flux<RoundResult> subscribeToResults(final String username, final String roundId) {

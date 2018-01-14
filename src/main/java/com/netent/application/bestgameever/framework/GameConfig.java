@@ -1,4 +1,4 @@
-package com.netent.application.bestgameever.entity;
+package com.netent.application.bestgameever.framework;
 
 public class GameConfig {
     private double cost;

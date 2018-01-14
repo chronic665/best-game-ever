@@ -1,7 +1,7 @@
 package com.netent.application.bestgameever.repo;
 
 import com.google.common.collect.TreeBasedTable;
-import com.netent.application.bestgameever.entity.GameConfig;
+import com.netent.application.bestgameever.framework.GameConfig;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import org.slf4j.Logger;
@@ -10,9 +10,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -24,11 +22,6 @@ public class InMemoryGameRepository implements GameRepository {
 
     public InMemoryGameRepository() {
         this.dataStore = TreeBasedTable.create();
-    }
-
-    @Override
-    public GameConfig getGameConfig() {
-        return new GameConfig(10, 0.3, 0.1, 20, 1000);
     }
 
     @Override
