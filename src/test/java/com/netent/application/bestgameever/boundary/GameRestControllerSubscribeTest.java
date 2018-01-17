@@ -2,8 +2,10 @@ package com.netent.application.bestgameever.boundary;
 
 import com.google.gson.Gson;
 import com.netent.application.bestgameever.control.GameService;
+import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
+import com.netent.application.bestgameever.entity.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +31,7 @@ import static org.mockito.BDDMockito.given;
 @RunWith(MockitoJUnitRunner.class)
 public class GameRestControllerSubscribeTest {
 
-    private static final String MOCK_USERNAME = "test";
+    private static final String MOCK_USERNAME = "testNormalGame";
     private static final String SUBSCRIBE_URL = "/subscribe";
 
     @Mock
@@ -83,7 +85,7 @@ public class GameRestControllerSubscribeTest {
                         () -> null,
                         (state, sink) -> {
                             RoundResult roundResult = new RoundResult(roundId, ResultType.LOSE);
-                            sink.next(roundResult);
+                            sink.next(new ResultPage(roundResult, new User()));
                             sink.complete();
                             return roundResult;
                         }
@@ -96,7 +98,7 @@ public class GameRestControllerSubscribeTest {
                 .expectBody()
                     .consumeWith(entityExchangeResult -> {
                         final String jsonString = new String(entityExchangeResult.getResponseBody()).substring(5).trim();
-                        final RoundResult content = new Gson().fromJson(jsonString, RoundResult.class);
+                        final RoundResult content = new Gson().fromJson(jsonString, ResultPage.class).getRoundResult();
                         assertThat(content.getRoundId(), is(roundId));
                         assertThat(content.getResult(), is(ResultType.LOSE));
                         assertThat(content.getTimestamp(), is(notNullValue()));

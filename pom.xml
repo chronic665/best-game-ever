@@ -69,6 +69,12 @@
 			<version>5.0.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.projectreactor.addons</groupId>
+			<artifactId>reactor-test</artifactId>
+			<version>3.0.3.RELEASE</version>
+		<scope>test</scope>
+	</dependency>
 	</dependencies>
 
 	<build>

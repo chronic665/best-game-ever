@@ -1,6 +1,7 @@
 package com.netent.application.bestgameever.boundary;
 
 import com.netent.application.bestgameever.control.GameService;
+import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.RoundResult;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,8 @@ public class GameRestController extends ValidatedRestController {
 
     @GetMapping(value = "/subscribe/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Publisher<RoundResult> subscribe(@PathVariable("username") final String username,
-                                            @RequestParam(value = "roundId", required = false) final String roundId) {
+    public Publisher<ResultPage> subscribe(@PathVariable("username") final String username,
+                                           @RequestParam(value = "roundId", required = false) final String roundId) {
         return gameService.subscribeToResults(username, roundId);
     }
 

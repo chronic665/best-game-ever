@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class LoginRestControllerTest {
 
-    private static final String MOCK_USERNAME = "test";
+    private static final String MOCK_USERNAME = "testNormalGame";
     public static final String LOGIN_URL = "/login";
 
     @Autowired
@@ -61,7 +61,7 @@ public class LoginRestControllerTest {
 
     @Test
     public void givenPostRequest_whenLoginWithExistingUsernameAndUseExistingTrue_ShouldReturnHttpOKAndResponseTypeI() throws Exception {
-        given(mockLoginService.login(MOCK_USERNAME, true)).willThrow(new UserAlreadyExistsException());
+        given(mockLoginService.login(MOCK_USERNAME, true)).willReturn(true);
         this.mockMvc.perform(
                     post(LOGIN_URL)
                     .param("username", MOCK_USERNAME)

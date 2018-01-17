@@ -13,7 +13,7 @@ public class GameFramework {
     private final GameConfig config;
 
     public GameFramework() {
-        // TODO move into application.yml
+        // TODO move into application.yml or somewhere configurable from the outside
         this.config = new GameConfig(10, 0.3, 0.1, 20, 1000);
     }
 

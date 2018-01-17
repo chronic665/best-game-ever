@@ -1,5 +1,6 @@
 package com.netent.application.bestgameever.control;
 
+import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
@@ -9,6 +10,8 @@ import com.netent.application.bestgameever.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+
+import java.util.function.Consumer;
 
 @Service
 public class GameService {
@@ -35,12 +38,12 @@ public class GameService {
         // 2.1 throw dice
         final ResultType result = framework.throwDice();
         // 2.3 store result
-        final String roundId = gameRepository.storeRound(result, username);
+        final String roundId = gameRepository.storeRound(result, username, false);
         // 2.4 update balance
         double currentBalance = personRepository.updateBalance(username, framework.calculateAmount(result, false));
         // 2.5 top up user if out-of-funds
         if (framework.outOfFunds(currentBalance)) {
-            gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username);
+            gameRepository.storeRound(ResultType.FILL_UP_BALANCE, username, false);
             personRepository.updateBalance(username, framework.getFillUpAmount());
         }
         // 3. if free round was won, trigger new round
@@ -57,14 +60,17 @@ public class GameService {
 
     private void freeRound(final String username) {
         final ResultType result = framework.throwDice();
-        gameRepository.storeRound(result, username);
+        gameRepository.storeRound(result, username, true);
         personRepository.updateBalance(username, framework.calculateAmount(result, true));
         if(wonAFreeRound(result) ) {
             freeRound(username);
         }
     }
 
-    public Flux<RoundResult> subscribeToResults(final String username, final String roundId) {
-        return gameRepository.subscribeToResults(username, roundId);
+    public Flux<ResultPage> subscribeToResults(final String username, final String roundId) {
+        return gameRepository.subscribeToResults(username, roundId)
+                .map(roundResult ->
+                    new ResultPage(roundResult, personRepository.find(username))
+                );
     }
 }

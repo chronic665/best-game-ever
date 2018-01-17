@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 
 public interface GameRepository {
 
-    String storeRound(ResultType result, String username);
+    String storeRound(ResultType result, String username, boolean freeRound);
 
     Flux<RoundResult> subscribeToResults(String username, String roundId);
 }

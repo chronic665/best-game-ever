@@ -22,6 +22,7 @@ public class GameFrameworkTest {
     private final double FREE_ROUND_RATE = 0.1;
     private final double COST = -10d;
     private final double PRIZE = 20d;
+    private final double ZERO = 0d;
     private static final double FILL_UP_AMOUNT = 1000d;
 
     private GameFramework cut;
@@ -71,11 +72,16 @@ public class GameFrameworkTest {
 
     @Test
     public void testMoneyCalculation() {
-        assertThat(cut.calculateAmount(null, true), is(COST));
-        assertThat(cut.calculateAmount(LOSE, true), is(COST));
-        assertThat(cut.calculateAmount(WIN, true), is(COST + PRIZE));
-        assertThat(cut.calculateAmount(WIN_AND_FREE_ROUND, true), is(COST + PRIZE));
-        assertThat(cut.calculateAmount(FREE_ROUND, true), is(COST));
+        assertThat(cut.calculateAmount(null, true), is(ZERO));
+        assertThat(cut.calculateAmount(null, false), is(COST));
+        assertThat(cut.calculateAmount(LOSE, true), is(ZERO));
+        assertThat(cut.calculateAmount(LOSE, false), is(COST));
+        assertThat(cut.calculateAmount(WIN, true), is(PRIZE));
+        assertThat(cut.calculateAmount(WIN, false), is(COST + PRIZE));
+        assertThat(cut.calculateAmount(WIN_AND_FREE_ROUND, false), is(COST + PRIZE));
+        assertThat(cut.calculateAmount(WIN_AND_FREE_ROUND, true), is(PRIZE));
+        assertThat(cut.calculateAmount(FREE_ROUND, false), is(COST));
+        assertThat(cut.calculateAmount(FREE_ROUND, true), is(ZERO));
         assertThrows(IllegalArgumentException.class, () -> cut.calculateAmount(FILL_UP_BALANCE, true));
     }
 

@@ -17,9 +17,8 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,7 +42,7 @@ public class GameServiceTest {
         given(personRepository.find(anyString())).willReturn(null);
         Assertions.assertThrows(UserDoesNotExistException.class, () -> cut.play(MOCK_USERNAME));
         verify(personRepository,times(0)).updateBalance(anyString(), any());
-        verify(gameRepository,times(0)).storeRound(any(), anyString());
+        verify(gameRepository,times(0)).storeRound(any(), anyString(), anyBoolean());
     }
 
     @Test
@@ -51,26 +50,26 @@ public class GameServiceTest {
         final String roundId = UUID.randomUUID().toString();
         given(personRepository.find(MOCK_USERNAME)).willReturn(new User(MOCK_USERNAME, 1000));
         given(personRepository.updateBalance(eq(MOCK_USERNAME), any())).willReturn((double) 1000);
-        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME))).willReturn(roundId);
+        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME), anyBoolean())).willReturn(roundId);
 
         String result = cut.play(MOCK_USERNAME);
         assertThat(result, is(roundId));
 
         verify(personRepository,times(1)).find(eq(MOCK_USERNAME));
         verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), any());
-        verify(gameRepository,times(1)).storeRound(any(), eq(MOCK_USERNAME));
+        verify(gameRepository,times(1)).storeRound(any(), eq(MOCK_USERNAME), anyBoolean());
     }
 
     @Test
     public void givenValidUsernameAndLowFunds_whenPlayingAndLosing_updateBalanceWithNewFunds() {
         final String roundId = UUID.randomUUID().toString();
         given(gameFramework.throwDice()).willReturn(ResultType.LOSE);
-        given(gameFramework.calculateAmount(any(), true)).willReturn(Double.valueOf(-10));
+        given(gameFramework.calculateAmount(ResultType.LOSE, false)).willReturn(Double.valueOf(-10));
         given(gameFramework.getFillUpAmount()).willReturn(Double.valueOf(1000));
         given(gameFramework.outOfFunds(any())).willReturn(true);
         given(personRepository.find(MOCK_USERNAME)).willReturn(new User(MOCK_USERNAME, Double.valueOf(-500)));
         given(personRepository.updateBalance(eq(MOCK_USERNAME), eq(Double.valueOf(-10)))).willReturn(Double.valueOf(-510));
-        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME))).willReturn(roundId);
+        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME), anyBoolean())).willReturn(roundId);
 
         String result = cut.play(MOCK_USERNAME);
         assertThat(result, is(roundId));
@@ -78,7 +77,7 @@ public class GameServiceTest {
         verify(personRepository,times(1)).find(eq(MOCK_USERNAME));
         verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), eq(Double.valueOf(-10)));
         verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), eq(Double.valueOf(1000)));
-        verify(gameRepository,times(1)).storeRound(eq(ResultType.LOSE), eq(MOCK_USERNAME));
-        verify(gameRepository,times(1)).storeRound(eq(ResultType.FILL_UP_BALANCE), eq(MOCK_USERNAME));
+        verify(gameRepository,times(1)).storeRound(eq(ResultType.LOSE), eq(MOCK_USERNAME), anyBoolean());
+        verify(gameRepository,times(1)).storeRound(eq(ResultType.FILL_UP_BALANCE), eq(MOCK_USERNAME), anyBoolean());
     }
 }
