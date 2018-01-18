@@ -1,10 +1,14 @@
 package com.netent.application.bestgameever.entity;
 
 import com.google.common.base.MoreObjects;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
+@Document(collection = "users")
 public class User {
+    @Id
     private String username;
     private double balance;
 

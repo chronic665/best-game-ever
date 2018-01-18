@@ -2,7 +2,6 @@ package com.netent.application.bestgameever.control;
 
 import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.ResultType;
-import com.netent.application.bestgameever.entity.RoundResult;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
 import com.netent.application.bestgameever.framework.GameFramework;
 import com.netent.application.bestgameever.repo.GameRepository;
@@ -10,8 +9,6 @@ import com.netent.application.bestgameever.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-
-import java.util.function.Consumer;
 
 @Service
 public class GameService {
@@ -29,6 +26,11 @@ public class GameService {
         this.framework = framework;
     }
 
+    /**
+     * Main game logic. Calculates round result, evaluates the result, stores results and triggers free rounds if they are won
+     * @param username
+     * @return
+     */
     public String play(final String username) {
         // 1. sanity check
         if (personRepository.find(username) == null) {
@@ -67,6 +69,13 @@ public class GameService {
         }
     }
 
+    /**
+     * Allows listening to game events. Merges round result with the respective users info (current balance etc.)
+     * If a roundId is provided only one result will be published and the stream will be closed afterwards.
+     * @param username
+     * @param roundId
+     * @return
+     */
     public Flux<ResultPage> subscribeToResults(final String username, final String roundId) {
         return gameRepository.subscribeToResults(username, roundId)
                 .map(roundResult ->
