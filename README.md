@@ -12,7 +12,7 @@ HTTP client that supports server side events can be used.
 
 Run the server via Spring Boot's maven plugin. The default configuration starts the server with in-memory data storage. See 'persistent profile' section to run with MongoDB backend. 
 ```
-    mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 ## How to play
@@ -23,26 +23,26 @@ so after a server restart the players must re-login.
 On login a user is created or, if the user already exists, the client must state that the existing user should be used.
 
 ```
-    http post http://localhost:8080/login?username=foobar&useExisting=true
+http post http://localhost:8080/login?username=foobar&useExisting=true
 ```
 
 There is not real authorization implemented, so everybody can watch every player's games or play for any (existing) player.
 
 ```
-    http post http://localhost:8080/plays/foobar
+http post http://localhost:8080/plays/foobar
 ```
 
 To receive the game results a client musst listen to a stream of server side events provided by the following endpoint:
 
 ```
-    http get http://localhost:8080/plays/foobar --stream
+http get http://localhost:8080/plays/foobar --stream
 ```
 
 To access a certain round the same endpoint can be called with the game round's id as a parameter. In this case, if a stream is requested
 the stream will automatically be closed after the first event is returned.
 ```
-    http get http://localhost:8080/plays/foobar?roundId=4711 --stream
-    http get http://localhost:8080/plays/foobar?roundId=4711
+http get http://localhost:8080/plays/foobar?roundId=4711 --stream
+http get http://localhost:8080/plays/foobar?roundId=4711
 ```
 
 ## Frontend
