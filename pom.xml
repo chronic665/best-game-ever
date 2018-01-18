@@ -91,6 +91,11 @@
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>23.6-jre</version>
@@ -108,6 +113,13 @@
 			<!--<version>2.0.2-SNAPSHOT</version>-->
 			<!--<scope>runtime</scope>-->
 		<!--</dependency>-->
+
+		<!-- Webjars for UI -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>3.3.7</version>
+		</dependency>
 
 
 		<dependency>

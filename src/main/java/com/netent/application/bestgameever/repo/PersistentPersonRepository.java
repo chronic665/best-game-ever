@@ -17,9 +17,9 @@ public class PersistentPersonRepository implements PersonRepository {
     }
 
     @Override
-    public boolean addUser(String username) {
+    public User addUser(String username) {
         User user = personRepo.save(new User(username, 1000d)).block();
-        return true;
+        return user;
     }
 
     @Override

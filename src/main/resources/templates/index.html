@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="Best Game Ever"/>
+    <meta name="author" content="Tobias Piper"/>
+    <title>Best Game Ever</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container wrapper">
+    <h2>Best Game Ever!!1!</h2>
+
+    <div th:if="${user == null}">
+        <div>Welcome, Guest</div>
+        <form action="/game/login" method="POST">
+            <input type="text" name="username" id="username"/>
+            <input type="submit" value="Login"/>
+        </form>
+    </div>
+    <!-- ELSE -->
+    <p th:text="${user}">bla</p>
+    <div th:unless="${user == null}">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4" th:text="'Player: ' + ${user.username}">Unknown User</div>
+                <div class="col-md-4" th:text="'Balance: ' + ${user.balance}">Unknown Balance</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <button th:onclick="'javascript:play(\'' + ${user.username} + '\')'" value="Play!">Play!!</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" id="playground"></div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script type="text/javascript" src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+
+    var listening = false;
+
+    // This function adds the given data point to the chart
+    var appendGameData = function (round) {
+        var node = document.createElement("DIV");
+        var text = round.roundResult.result + "| Balance: " + round.balance;
+
+        text = text + " | Free round: " + round.roundResult.freeRound;
+        var textnode = document.createTextNode(text);
+        node.appendChild(textnode);
+        document.getElementById("playground").appendChild(node);
+    };
+
+    var play = function (username) {
+        if(!listening) {
+            listening = true;
+            // The browser connects to the server and receives quotes using ServerSentEvents
+            // those quotes are appended to the chart as they're received
+            var eventSource = new EventSource("/game/subscribe");
+            eventSource.onmessage = function (e) {
+                appendGameData(JSON.parse(e.data));
+            };
+        }
+
+        var http = new XMLHttpRequest();
+        var url = "/plays/" + username;
+        var params = "";
+        http.open("POST", url, true);
+
+        //Send the proper header information along with the request
+        //http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        http.onreadystatechange = function() {//Call a function when the state changes.
+            if(http.readyState == 4 && http.status == 200) {
+                //alert(http.responseText);
+            }
+        }
+        http.send(params);
+    }
+
+</script>
+</body>
+</html>

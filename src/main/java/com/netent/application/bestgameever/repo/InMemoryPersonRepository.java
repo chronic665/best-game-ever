@@ -18,12 +18,11 @@ public class InMemoryPersonRepository implements PersonRepository {
     }
 
     @Override
-    public boolean addUser(String username) {
-        if(users.containsKey(username)) {
-            return false;
+    public User addUser(String username) {
+        if(!users.containsKey(username)) {
+            users.put(username, new User(username, 1000));
         }
-        users.put(username, new User(username, 1000));
-        return true;
+        return users.get(username);
     }
 
     @Override
