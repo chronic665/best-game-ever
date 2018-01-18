@@ -54,6 +54,8 @@ the stream will automatically be closed after the first event is returned.
 The persistent profile makes use of a MongoDB feature called [$changeStream](http://mongodb.github.io/mongo-java-driver/3.6/driver-async/tutorials/change-streams/), which is available starting with version 3.6.0.
 This feature is built on the replica set synchronization logs, so it can only be used when the server is configured as a replica set (local installation can be configured as a single node RS).
 
+Tests for the Persistent Repositories have been suspended until the []Embedded MongoDB project](https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo) supports MongoDB 3.6.0 features. Without that, a running, compatible MongoDB would be required for building and running even the in-memory version of this game.
+
 ### start mongodb container
 
 ```
