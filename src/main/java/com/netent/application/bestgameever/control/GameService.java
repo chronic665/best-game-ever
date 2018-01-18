@@ -2,7 +2,6 @@ package com.netent.application.bestgameever.control;
 
 import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.ResultType;
-import com.netent.application.bestgameever.entity.RoundResult;
 import com.netent.application.bestgameever.exception.UserDoesNotExistException;
 import com.netent.application.bestgameever.framework.GameFramework;
 import com.netent.application.bestgameever.repo.GameRepository;
@@ -10,8 +9,6 @@ import com.netent.application.bestgameever.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-
-import java.util.function.Consumer;
 
 @Service
 public class GameService {

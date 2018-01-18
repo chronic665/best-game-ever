@@ -1,23 +1,20 @@
 package com.netent.application.bestgameever.repo;
 
 import com.google.common.collect.TreeBasedTable;
-import com.netent.application.bestgameever.dto.ResultPage;
 import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.RoundResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Repository
+@Profile("default")
 public class InMemoryGameRepository implements GameRepository {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -29,7 +26,7 @@ public class InMemoryGameRepository implements GameRepository {
 
     @Override
     public String storeRound(final ResultType result, final String username, boolean freeRound) {
-        final RoundResult roundResult = new RoundResult(generateId(), result, freeRound);
+        final RoundResult roundResult = new RoundResult(generateId(), username, result, freeRound);
         dataStore.put(username, roundResult.getTimestamp(), roundResult);
         return roundResult.getRoundId();
     }

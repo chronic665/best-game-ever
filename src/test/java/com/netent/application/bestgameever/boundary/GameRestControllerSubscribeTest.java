@@ -84,7 +84,7 @@ public class GameRestControllerSubscribeTest {
                 Flux.generate(
                         () -> null,
                         (state, sink) -> {
-                            RoundResult roundResult = new RoundResult(roundId, ResultType.LOSE);
+                            RoundResult roundResult = new RoundResult(roundId, MOCK_USERNAME, ResultType.LOSE, false);
                             sink.next(new ResultPage(roundResult, new User()));
                             sink.complete();
                             return roundResult;
@@ -102,6 +102,36 @@ public class GameRestControllerSubscribeTest {
                         assertThat(content.getRoundId(), is(roundId));
                         assertThat(content.getResult(), is(ResultType.LOSE));
                         assertThat(content.getTimestamp(), is(notNullValue()));
+                        assertThat(content.isFreeRound(), is(false));
+                    });
+    }
+
+    @Test
+    public void givenValidUsernameAndValidRoundAndFreeRound_whenGetToSubscribe_thenReturnsHttp200AndRoundResult() {
+        final String roundId = "4711";
+        given(mockGameService.subscribeToResults(eq(MOCK_USERNAME), eq(roundId))).willReturn(
+                Flux.generate(
+                        () -> null,
+                        (state, sink) -> {
+                            RoundResult roundResult = new RoundResult(roundId, MOCK_USERNAME, ResultType.LOSE, true);
+                            sink.next(new ResultPage(roundResult, new User()));
+                            sink.complete();
+                            return roundResult;
+                        }
+                )
+        );
+        this.client.get()
+                .uri(SUBSCRIBE_URL + "/" + MOCK_USERNAME + "?roundId=" + roundId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                    .consumeWith(entityExchangeResult -> {
+                        final String jsonString = new String(entityExchangeResult.getResponseBody()).substring(5).trim();
+                        final RoundResult content = new Gson().fromJson(jsonString, ResultPage.class).getRoundResult();
+                        assertThat(content.getRoundId(), is(roundId));
+                        assertThat(content.getResult(), is(ResultType.LOSE));
+                        assertThat(content.getTimestamp(), is(notNullValue()));
+                        assertThat(content.isFreeRound(), is(true));
                     });
     }
 }
