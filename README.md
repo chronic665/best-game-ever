@@ -3,15 +3,23 @@
 ## Reactive web game
 
 The game makes use of RESTful endpoints and server side event streams. This decouples client and server and allows easy
-consumption of game data from multiple clients.
+consumption of game data from multiple clients. Using the 'persistent' profile, the game events are directly streamed from within the database to the HTTP client
 
-The HTTP call examples are using the [HTTPie](https://httpie.org/] library for improved readability.
-Any HTTP client that supports server side events can be used.
+The HTTP call examples are using the [HTTPie](https://httpie.org/) library for improved readability, but any 
+HTTP client that supports server side events can be used.
+
+## Running the server
+
+Run the server via Spring Boot's maven plugin. The default configuration starts the server with in-memory data storage. See 'persistent profile' section to run with MongoDB backend. 
+```
+    mvn spring-boot:run
+```
 
 ## How to play
 
 A player must first register / login using the /login endpoint.
-The player data is not persisted, so after a server restart the players must re-login.
+If the server is not started with the "persistent" Spring profile, neither the game nor the player data is not persisted, 
+so after a server restart the players must re-login.
 On login a user is created or, if the user already exists, the client must state that the existing user should be used.
 
 ```
@@ -38,24 +46,32 @@ the stream will automatically be closed after the first event is returned.
 ```
 
 
- see: https://blog.codecentric.de/en/2018/01/change-streams-mongodb-3-6/
+ see: 
  also: http://mongodb.github.io/mongo-java-driver/3.6/driver/tutorials/change-streams/
 
 ## persistent profile
 
+The persistent profile makes use of a MongoDB feature called [$changeStream](http://mongodb.github.io/mongo-java-driver/3.6/driver-async/tutorials/change-streams/), which is available starting with version 3.6.0.
+This feature is built on the replica set synchronization logs, so it can only be used when the server is configured as a replica set (local installation can be configured as a single node RS).
+
 ### start mongodb container
 
-docker run \
--p 27017:27017 \
---name bge-mongo -d \
-mongo:3.6.2 mongod --replSet my-mongo-set
-
-### configure mongodb as replica set to allow $changeStreams to work
+```
+docker run \\
+    -p 27017:27017 \\
+    --name bge-mongo -d \
+    mongo:3.6.2 mongod --replSet my-mongo-set
+```
+### configure mongodb as replica set
+```
 $ mongo
 > config = { "_id" : "my-mongo-set", "members" : [{ "_id": 0, "host" : "localhost:27017"}]}
 > rs.initiate(config)
-
-### activate mongodb 3.6.x features (must be run on primary node in replica set)
+```
+### activate mongodb 3.6.x features 
+must be run on primary node in replica set (hard to get wrong on local single node installation) ([reference](https://blog.codecentric.de/en/2018/01/change-streams-mongodb-3-6/))
+```
 $ mongo
 > use admin
 > db.adminCommand( { setFeatureCompatibilityVersion: "3.6" } )
+```
