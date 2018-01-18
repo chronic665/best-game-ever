@@ -45,9 +45,12 @@ the stream will automatically be closed after the first event is returned.
     http get http://localhost:8080/plays/foobar?roundId=4711
 ```
 
+## Frontend
+Running the server also delivers a small Thymeleaf frontend under http://localhost:8080/game
 
- see: 
- also: http://mongodb.github.io/mongo-java-driver/3.6/driver/tutorials/change-streams/
+Log in with a random username. Clicking on play once will also register the frontend as a listener to the game event stream.
+
+Logging in with several browser windows with the same user name will result in all users receiving all events for that user name (click 'Play!' once to register for listening) 
 
 ## persistent profile
 
@@ -77,3 +80,4 @@ $ mongo
 > use admin
 > db.adminCommand( { setFeatureCompatibilityVersion: "3.6" } )
 ```
+

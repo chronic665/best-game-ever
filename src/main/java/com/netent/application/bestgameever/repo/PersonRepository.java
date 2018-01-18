@@ -4,7 +4,7 @@ import com.netent.application.bestgameever.entity.User;
 
 public interface PersonRepository {
 
-    boolean addUser(String username);
+    User addUser(String username);
 
     User find(String username);
 

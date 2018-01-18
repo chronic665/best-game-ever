@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class FluxEnableTreeBasedTable<R, C, V> extends TreeBasedTable<R, C, V> {
     private final Logger log = LoggerFactory.getLogger(getClass());
-
+    private Object sync = new Object();
 
     FluxEnableTreeBasedTable(Comparator<? super R> rowComparator, Comparator<? super C> columnComparator) {
         super(rowComparator, columnComparator);
@@ -54,12 +54,14 @@ public class FluxEnableTreeBasedTable<R, C, V> extends TreeBasedTable<R, C, V> {
     @Override
     public V put(R rowKey, C columnKey, V value) {
         V put = super.put(rowKey, columnKey, value);
-        subscribers.entrySet().stream()
-                .filter(entry -> entry.getKey().equals(rowKey))
-                .forEach(entry -> entry.getValue().stream()
-                        // call onPut for all listeners
-                        .forEach(listener -> listener.onPut(value))
-                );
+        synchronized (sync) {
+            subscribers.entrySet().stream()
+                    .filter(entry -> entry.getKey().equals(rowKey))
+                    .forEach(entry -> entry.getValue().stream()
+                            // call onPut for all listeners
+                            .forEach(listener -> listener.onPut(value))
+                    );
+        }
         return put;
     }
 

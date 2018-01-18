@@ -26,16 +26,15 @@ public class LoginService {
      * @return
      * @throws UserAlreadyExistsException
      */
-    public boolean login(String username, boolean useExisting) throws UserAlreadyExistsException {
+    public User login(String username, boolean useExisting) throws UserAlreadyExistsException {
         User user = this.personRepository.find(username);
         if(null != user) {
             if(!useExisting) {
                 throw new UserAlreadyExistsException();
             }
-            return true;
+            return user;
         } else {
-            personRepository.addUser(username);
-            return true;
+            return personRepository.addUser(username);
         }
     }
 
