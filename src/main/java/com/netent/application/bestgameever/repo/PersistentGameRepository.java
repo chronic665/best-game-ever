@@ -53,10 +53,10 @@ public class PersistentGameRepository implements GameRepository {
     public Flux<RoundResult> subscribeToResults(String username, String roundId) {
         // if roundId is provided only resolve a single element (=Mono)
         if(null != roundId) {
-            return Mono.from(
-                    repo.findById(roundId)
+            return repo.findByRoundId(roundId)
+                    .doOnEach(each -> System.out.println(each))
                         .filter(round -> username.equals(round.getUsername()))
-            ).flux();
+                        .flux();
         }
         // if no roundId is provided, register a Subscriber to the $changeStream functionality of the
         // reactive mongo driver and stream out the result

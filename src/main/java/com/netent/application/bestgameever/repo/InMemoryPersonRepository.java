@@ -1,15 +1,14 @@
 package com.netent.application.bestgameever.repo;
 
-import com.netent.application.bestgameever.entity.ResultType;
 import com.netent.application.bestgameever.entity.User;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Repository
+@Profile("default")
 public class InMemoryPersonRepository implements PersonRepository {
 
     private final Map<String, User> users;
