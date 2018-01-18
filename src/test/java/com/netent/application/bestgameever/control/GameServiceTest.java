@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.UUID;
 
@@ -79,5 +81,42 @@ public class GameServiceTest {
         verify(personRepository,times(1)).updateBalance(eq(MOCK_USERNAME), eq(Double.valueOf(1000)));
         verify(gameRepository,times(1)).storeRound(eq(ResultType.LOSE), eq(MOCK_USERNAME), anyBoolean());
         verify(gameRepository,times(1)).storeRound(eq(ResultType.FILL_UP_BALANCE), eq(MOCK_USERNAME), anyBoolean());
+    }
+
+
+    @Test
+    public void givenValidUsername_whenPlayingAndLosingButFreeRound_callFreeRoundMethodsandReturnUUID() {
+        final String roundId = UUID.randomUUID().toString();
+
+        given(gameFramework.throwDice()).willAnswer(new Answer<ResultType>() {
+            int call = 0;
+            @Override
+            public ResultType answer(InvocationOnMock invocationOnMock) throws Throwable {
+                if(call == 0) {
+                    call++;
+                    return ResultType.FREE_ROUND;
+                }
+                else if(call == 1) {
+                    return ResultType.LOSE;
+                }
+                throw new RuntimeException("Too many calls");
+            }
+        });
+        given(personRepository.find(MOCK_USERNAME)).willReturn(new User(MOCK_USERNAME, 1000d));
+        given(personRepository.updateBalance(eq(MOCK_USERNAME), any())).willReturn(990d);
+        given(gameRepository.storeRound(any(), eq(MOCK_USERNAME), anyBoolean())).willReturn(roundId);
+
+        String result = cut.play(MOCK_USERNAME);
+        assertThat(result, is(roundId));
+
+        verify(gameFramework,times(2)).throwDice();
+        verify(gameFramework,times(1)).calculateAmount(any(), eq(false));
+        verify(gameFramework,times(1)).calculateAmount(any(), eq(true));
+
+        verify(personRepository,times(1)).find(eq(MOCK_USERNAME));
+        verify(personRepository,times(2)).updateBalance(eq(MOCK_USERNAME), eq(0d));
+
+        verify(gameRepository,times(1)).storeRound(ResultType.FREE_ROUND, MOCK_USERNAME, false);
+        verify(gameRepository,times(1)).storeRound(ResultType.LOSE, MOCK_USERNAME, true);
     }
 }

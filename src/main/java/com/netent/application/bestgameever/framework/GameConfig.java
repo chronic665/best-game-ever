@@ -1,14 +1,11 @@
 package com.netent.application.bestgameever.framework;
 
 public class GameConfig {
-    private double cost;
-    private double winRate;
-    private double freeRoundRate;
-    private double prize;
-    private double fillUpAmount;
-
-    public GameConfig() {
-    }
+    private final double cost;
+    private final double winRate;
+    private final double freeRoundRate;
+    private final double prize;
+    private final double fillUpAmount;
 
     public GameConfig(double cost, double winRate, double freeRoundRate, double prize, double fillUpAmount) {
         this.cost = cost;
@@ -22,39 +19,20 @@ public class GameConfig {
         return cost;
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
-
     public double getWinRate() {
         return winRate;
-    }
-
-    public void setWinRate(double winRate) {
-        this.winRate = winRate;
     }
 
     public double getFreeRoundRate() {
         return freeRoundRate;
     }
 
-    public void setFreeRoundRate(double freeRoundRate) {
-        this.freeRoundRate = freeRoundRate;
-    }
-
     public double getPrize() {
         return prize;
-    }
-
-    public void setPrize(double prize) {
-        this.prize = prize;
     }
 
     public double getFillUpAmount() {
         return fillUpAmount;
     }
-
-    public void setFillUpAmount(double fillUpAmount) {
-        this.fillUpAmount = fillUpAmount;
-    }
 }
+

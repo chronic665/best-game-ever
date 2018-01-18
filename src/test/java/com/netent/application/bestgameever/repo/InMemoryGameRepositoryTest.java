@@ -40,13 +40,13 @@ public class InMemoryGameRepositoryTest {
             // wait for StepVerifier to start listening
             sleep(1000);
             this.cut.storeRound(ResultType.FREE_ROUND, MOCK_USERNAME, false);
-            sleep(20);
+            sleep(100);
             this.cut.storeRound(ResultType.WIN, MOCK_USERNAME, true);
-            sleep(20);
+            sleep(100);
             this.cut.storeRound(ResultType.LOSE, MOCK_USERNAME, false);
-            sleep(20);
+            sleep(100);
             this.cut.storeRound(ResultType.WIN_AND_FREE_ROUND, MOCK_USERNAME, false);
-            sleep(20);
+            sleep(100);
             this.cut.storeRound(ResultType.LOSE, MOCK_USERNAME, true);
         }).start();
         StepVerifier.create(
