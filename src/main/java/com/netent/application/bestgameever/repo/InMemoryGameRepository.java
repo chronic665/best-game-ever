@@ -13,6 +13,13 @@ import reactor.core.publisher.Flux;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Mock implementation of a Stream enabled game repository. Can be used for testing without a running MongoDB.
+ *<br />
+ * Uses a Guava table as data store.
+ * <br /><br />
+ * <b>State does not survive application restarts!</b>
+ */
 @Repository
 @Profile("default")
 public class InMemoryGameRepository implements GameRepository {

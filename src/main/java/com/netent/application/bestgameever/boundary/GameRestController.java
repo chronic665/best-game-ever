@@ -27,13 +27,25 @@ public class GameRestController extends ValidatedRestController {
         this.gameService = gameService;
     }
 
-    @PostMapping(value = "/play")
-    public ResponseEntity<String> play(@RequestParam @NotEmpty String username) {
+    /**
+     * REST mapping for playing. User must have callend the /login route before being able to play.
+     * @param username
+     * @return
+     */
+    @PostMapping(value = "/plays/{username}")
+    public ResponseEntity<String> play(@PathVariable("username") String username) {
         String roundId = gameService.play(username);
         return new ResponseEntity<>(roundId, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/subscribe/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    /**
+     * REST mapping to listen on for game events for a user. Provides an infinite stream of server side events.
+     * @param username
+     * @param roundId - optional: if provided only a certain round (or HTTP 404 if not existing) will be
+     *                returned and the stream will be closed afterwards
+     * @return
+     */
+    @GetMapping(value = "/plays/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
     public Publisher<ResultPage> subscribe(@PathVariable("username") final String username,
                                            @RequestParam(value = "roundId", required = false) final String roundId) {

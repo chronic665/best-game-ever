@@ -16,6 +16,16 @@ public class LoginService {
         this.personRepository = personRepository;
     }
 
+    /**
+     * Simple mock implementation of a user service.
+     * Combines registration and login. If "useExisting" is false, an exception will be thrown if there
+     * already exists a user with the given username.
+     * Adds the user to a repository if she doesn't exist
+     * @param username
+     * @param useExisting
+     * @return
+     * @throws UserAlreadyExistsException
+     */
     public boolean login(String username, boolean useExisting) throws UserAlreadyExistsException {
         User user = this.personRepository.find(username);
         if(null != user) {

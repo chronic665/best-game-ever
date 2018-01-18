@@ -8,5 +8,4 @@ import reactor.core.publisher.Flux;
 @Profile("persistent")
 public interface PersistentRoundResultRepository extends ReactiveCrudRepository<RoundResult, String> {
 
-    Flux<RoundResult> findByUsername(String username);
 }
