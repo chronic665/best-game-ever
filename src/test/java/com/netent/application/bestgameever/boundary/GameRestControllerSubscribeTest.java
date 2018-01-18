@@ -32,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 public class GameRestControllerSubscribeTest {
 
     private static final String MOCK_USERNAME = "testNormalGame";
-    private static final String SUBSCRIBE_URL = "/subscribe";
+    private static final String SUBSCRIBE_URL = "/plays";
 
     @Mock
     private GameService mockGameService;

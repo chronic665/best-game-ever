@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GameRestControllerPlayTest {
 
     private static final String MOCK_USERNAME = "test";
-    private static final String PLAY_URL = "/play";
+    private static final String PLAY_URL = "/plays";
     @Autowired
     private MockMvc mockMvc;
 
@@ -39,8 +39,7 @@ public class GameRestControllerPlayTest {
     public void givenUsername_whenPostToPlay_thenReturnsHttp200AndUUID() throws Exception {
         given(mockGameService.play(MOCK_USERNAME)).willReturn(UUID.randomUUID().toString());
         this.mockMvc.perform(
-                post(PLAY_URL)
-                        .param("username", MOCK_USERNAME)
+                post(PLAY_URL + "/" + MOCK_USERNAME)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -48,32 +47,28 @@ public class GameRestControllerPlayTest {
     }
 
     @Test
-    public void givenEmptyUsername_whenPostToPlay_thenReturnsHttp400() throws Exception {
+    public void givenEmptyUsername_whenPostToPlay_thenReturnsHttp404() throws Exception {
         given(mockGameService.play(MOCK_USERNAME)).willReturn(UUID.randomUUID().toString());
         this.mockMvc.perform(
-                post(PLAY_URL)
-                        .param("username", "")
+                post(PLAY_URL + "/")
                 )
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(status().reason(containsString("Please make sure you provide a not-empty request parameter 'username'")));
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void givenNoUsername_whenPostToPlay_thenReturnsHttp400() throws Exception {
+    public void givenNoUsername_whenPostToPlay_thenReturnsHttp404() throws Exception {
         given(mockGameService.play(MOCK_USERNAME)).willReturn(UUID.randomUUID().toString());
         this.mockMvc.perform(post(PLAY_URL))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Required String parameter 'username' is not present"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void givenNonExistentUsername_whenPostToPlay_thenReturnsHttp404() throws Exception {
+    public void givenNonExistentUsername_whenPostToPlay_thenReturnsHttp400() throws Exception {
         given(mockGameService.play(MOCK_USERNAME)).willThrow(new UserDoesNotExistException(MOCK_USERNAME));
         this.mockMvc.perform(
-                    post(PLAY_URL)
-                        .param("username", MOCK_USERNAME))
+                    post(PLAY_URL + "/" + MOCK_USERNAME))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("No user with this username exists. Please login first!"));
